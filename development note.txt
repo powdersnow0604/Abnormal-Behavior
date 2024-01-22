@@ -1,6 +1,35 @@
 [2024-01-17]
-1. state vector 에 관한 연산 (raise issue)
+1. state vector 에 관한 연산 (raise issue, x)
 	1) pixel 값들을 바탕으로 하므로, 정수형으로 판단 가능
 	2) 단, 행렬 연산에 사용되므로 부동 소수점 사용
-	3) 부동 소수점의 연산 대신 정수형 연산을 사용하고 싶은데(e.g. /2 -> >>1), 부동 소수점으로 저장하였기에, 단순히 정수형으로 casting 하여 계산할 수 없음
+	3) 부동 소수점의 연산 대신 정수형 연산을 사용하고 싶은데(e.g. /2 -> >>1), 부동 소수점으로 저장하였기에, 단순히 정수형으로 casting 하여 계산할 수 없음(truncation error)
 	4) 일단 부동 소수점의 연산으로 만듬(iou 파트) 
+
+2. test 를 위해 opencv 등을 사용하기 위해 일단 cpp 로 작성(suggest)
+	1) restrict keyword 사용 x
+
+[2024-01-20]
+1. initial state covariance, moiton cov, innovation cov 의 값이 정적, 동적인 경우 모두 만듬 (suggest)
+2. state covariance 의 대각선의 원소에 접근할 때, kf_sv_size 를 이용하는 대신 숫자로 하드코딩 해놓음
+3. kalman filter 관련 macro
+	1) KF_DEBUG: 정의되면, debug 용으로 행렬들을 print 함
+	2) KF_DYNAMIC_COV: 정의되면, covariance 들을 mean 에 따라 동적으로 결정
+	3) KF_NOPT_MM: 정의되면, 행렬 곱셈 최적화 사용 X
+4. 혹시 sv size 와 mv size 를 바꾼다고 할 때, 추가로 변경해야 되는 부분들
+	1) covariance 의 대각선 접근
+	2) 행렬 곱셈 최적화 부분
+
+[2024-01-21]
+1. 현재 코드는 multi-threading 이 고려되지 않았음(raise issue, x)
+2. 역행렬을 계산할 때, determinant 계산 x -> div by zero 발생 가능(raise issue, x)
+
+[2024-01-22]
+1. covariance 를 원소 4개 짜리 vector 로 압축
+	1) 압축시키는 것에 의해, 원 sort 의 분산 적용 방식을 따르지 못하게 됨 (raise issue, x)
+	2) [:2,:2] 와 [2,2] 는 다른 분산 값이 원래는 적용되어야 함
+	3) covariance 가 원소 5 개 짜리 vector 로 만들어지면 해결되는 문제
+	4) 하지만, memory 를 일단 더 중시하여, 이렇게 만듬
+2. track 가능한 customer 의 max 값을 정해놓음 (raise issue, x)
+	1) max 값은 변경 가능 단, 2 의 거듭제곱 형태여야 함
+	2) 새로 생성되는 track 들을 track 의 배열에 추가할 때, max 값을 넘기게 되면, 일단 배열의 제일 앞에서부터 덮어씌우도록 만듬
+3. header 에 정의된 모든 const 변수들을 typedefs.h 로 옮김

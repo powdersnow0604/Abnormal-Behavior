@@ -3,22 +3,29 @@
 
 #include "typedefs.h"
 
+#ifdef __cplusplus
 extern "C" {
+#endif
+
 #include <time.h>
 
 	typedef struct {
 		//vector with 7 elements
 		//center x, center y, area w*h, ratio w/h, velocity of x, velocity of y velocity of x
-		ELEM_T* statevector;
+		ELEM_T* statemean;
 
-		//matrix whose size is (7, 7)
+		//vector with 4 elements
 		ELEM_T* statecovariance;
 
 		ID_TYPE id;
 		time_t timestamp;
+		age_t age;
 	}customer_t;
 
-	customer_t create_customer(ELEM_T* sv, ELEM_T* sc, ID_TYPE _id);
+	void create_customer(customer_t* customer, ELEM_T* detection, ID_TYPE _id);
+
+#ifdef __cplusplus
 }
+#endif
 
 #endif
