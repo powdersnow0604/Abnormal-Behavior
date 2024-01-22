@@ -3,10 +3,25 @@
 #include <string.h>
 #include "iou.h"
 
-
 #ifdef KF_DEBUG
 #include <stdio.h>
 #endif
+
+
+#ifdef _MSC_VER
+#define ALIGNED_ALLOC(align, size) _aligned_malloc((size), (align))
+#else
+#define ALIGNED_ALLOC(align, size) aligned_alloc((align), (size))
+#endif
+
+#ifdef _MSC_VER
+#define ALIGNED_FREE(ptr) _aligned_free((ptr))
+#else
+#define ALIGNED_FREE(ptr) free((ptr))
+#endif
+
+#define ALIGNMENT 4
+
 
 #ifdef __cplusplus
 extern "C"{
@@ -77,11 +92,11 @@ extern "C"{
 
     void kf_init(void)
     {
-        kf_kalman_gain = (ELEM_T*)malloc(3 * sizeof(ELEM_T));
-        kf_temp_det = (ELEM_T*)malloc(kf_mv_size * sizeof(ELEM_T));
+        kf_kalman_gain = (ELEM_T*)ALIGNED_ALLOC(ALIGNMENT, 3 * sizeof(ELEM_T));
+        kf_temp_det = (ELEM_T*)ALIGNED_ALLOC(ALIGNMENT, kf_mv_size * sizeof(ELEM_T));
     }
 
-    void kf_initialize_track(const ELEM_T* measurement, ELEM_T* mean, ELEM_T* covariance)
+    void kf_initialize_track(const detection_t* measurement, ELEM_T* mean, ELEM_T* covariance)
     {
         //measurement 는 tlbr 로 입력되는 것을 상정
         index_t i;
@@ -133,9 +148,9 @@ extern "C"{
         covariance[1] += 1e-4;
         covariance[2] += std_weight_velocity * h * std_weight_position * h;
         #else
-        covariance[0] += 1e-4; //1
-        covariance[1] += 1e-4; //1
-        covariance[2] += 1e-4; //1e-1
+        covariance[0] += 1e-2; //1
+        covariance[1] += 1e-2; //1
+        covariance[2] += 1e-2; //1e-1
         #endif
         
 
@@ -146,7 +161,7 @@ extern "C"{
 
     }
 
-    void kf_update(const ELEM_T* measurement, ELEM_T* mean, ELEM_T* covariance)
+    void kf_update(const detection_t* measurement, ELEM_T* mean, ELEM_T* covariance)
     {
         //measurement 는 tlbr 로 입력되는 것을 상정
 
@@ -161,9 +176,9 @@ extern "C"{
         kf_kalman_gain[1] = covariance[1] / (covariance[1] + 1e-2);
         kf_kalman_gain[2] = covariance[3] / (covariance[0] + kf_temp_det[0]);
         #else
-        kf_kalman_gain[0] = covariance[0] / (covariance[0] + 1e-2); //1
-        kf_kalman_gain[1] = covariance[1] / (covariance[1] + 1e-2); //10
-        kf_kalman_gain[2] = covariance[3] / (covariance[0] + 1e-2); //1
+        kf_kalman_gain[0] = covariance[0] / (covariance[0] + 1e-1); //1
+        kf_kalman_gain[1] = covariance[1] / (covariance[1] + 1e-1); //10
+        kf_kalman_gain[2] = covariance[3] / (covariance[0] + 1e-1); //1
         #endif
 
         //measurement: tlbr -> xysr
@@ -204,8 +219,8 @@ extern "C"{
     }
     void kf_destroy(void)
     {
-        free(kf_kalman_gain);
-        free(kf_temp_det);
+        ALIGNED_FREE(kf_kalman_gain);
+        ALIGNED_FREE(kf_temp_det);
     }
 
 

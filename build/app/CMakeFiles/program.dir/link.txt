@@ -1,0 +1,1 @@
+/usr/bin/c++  -g   CMakeFiles/program.dir/main.cpp.o  -o ../../bin/program  -Wl,-rpath,/home/powdersnow/workspace/C_derived/library/OpenBLAS/lib ../lib/libtotal_ot.a /home/powdersnow/workspace/C_derived/library/OpenBLAS/lib/libopenblas.so 

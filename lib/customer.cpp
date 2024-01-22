@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-	void create_customer(customer_t* customer, ELEM_T* detection, ID_TYPE _id)
+	void create_customer(customer_t* customer, const detection_t* detection, ID_TYPE _id)
 	{
 		kf_initialize_track(detection, customer->statemean, customer->statecovariance);
 		customer->id = _id;

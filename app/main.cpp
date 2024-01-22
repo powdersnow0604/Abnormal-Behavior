@@ -5,7 +5,7 @@
 
 ELEM_T mean[7] = {0,};
 ELEM_T cov[4] = {0,};
-ELEM_T det[4] = {0,1,2,3};
+detection_t det = {0, 1, 2, 3,};
 
 
 static void print_mat(const char* des, const ELEM_T* mat, int8_t row, int8_t col)
@@ -64,17 +64,17 @@ int main()
 {
 
     kf_init();
-    kf_initialize_track(det, mean, cov);
+    kf_initialize_track(&det, mean, cov);
 
     for(index_t i = 0; i < 100; i++){
         kf_predict(mean, cov);
 
-        det[0] += 1;
-        det[1] += 1;
-        det[2] += 1;
-        det[3] += 1;
+        det.x1 += 1;
+        det.y1 += 1;
+        det.x2 += 1;
+        det.y2 += 1;
 
-        kf_update(det, mean, cov);
+        kf_update(&det, mean, cov);
     }
 
     kf_destroy();

@@ -22,7 +22,7 @@ extern "C" {
 		age_t age;
 	}customer_t;
 
-	void create_customer(customer_t* customer, ELEM_T* detection, ID_TYPE _id);
+	void create_customer(customer_t* customer, const detection_t* detection, ID_TYPE _id);
 
 #ifdef __cplusplus
 }

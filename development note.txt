@@ -26,10 +26,12 @@
 [2024-01-22]
 1. covariance 를 원소 4개 짜리 vector 로 압축
 	1) 압축시키는 것에 의해, 원 sort 의 분산 적용 방식을 따르지 못하게 됨 (raise issue, x)
-	2) [:2,:2] 와 [2,2] 는 다른 분산 값이 원래는 적용되어야 함
-	3) covariance 가 원소 5 개 짜리 vector 로 만들어지면 해결되는 문제
-	4) 하지만, memory 를 일단 더 중시하여, 이렇게 만듬
+	2) [:2,:2] 와 [2,2] / [4:6, 4:6] 와 [6,6] 은 다른 분산 값이 원래는 적용되어야 함
+	3) covariance 가 원소 5 ~ 6 개 짜리 vector 로 만들어지면 해결되는 문제
+	4) 하지만, memory 를 일단 더 중시하여, 원소의 개수를 줄이는 것으로 결정
 2. track 가능한 customer 의 max 값을 정해놓음 (raise issue, x)
 	1) max 값은 변경 가능 단, 2 의 거듭제곱 형태여야 함
 	2) 새로 생성되는 track 들을 track 의 배열에 추가할 때, max 값을 넘기게 되면, 일단 배열의 제일 앞에서부터 덮어씌우도록 만듬
 3. header 에 정의된 모든 const 변수들을 typedefs.h 로 옮김
+4. 동적할당을 aligned_alloc 을 사용하도록 변경
+	1) 일단 alignment 는 tracker-64, kf-4 로 설정함
