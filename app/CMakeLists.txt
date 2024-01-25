@@ -3,5 +3,8 @@ file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
   ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp
 )
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} [OpenCV.cmake PATH])
+find_package(OpenCV REQUIRED)
+
 add_executable(program ${SRC_FILES})
-target_link_libraries(program PUBLIC total_ot)
+target_link_libraries(program PUBLIC total_ot ${OpenCV_LIBRARIES})

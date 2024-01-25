@@ -1,86 +1,79 @@
-#include <iou.h>
-#include "kalman_filter.h"
-#include <stdio.h>
+#include "detect.h"
+#include <fstream>
+#include <chrono>
 
 
-ELEM_T mean[7] = {0,};
-ELEM_T cov[4] = {0,};
-detection_t det = {0, 1, 2, 3,};
+using namespace std;
+using namespace cv;
+using namespace cv::dnn;
 
 
-static void print_mat(const char* des, const ELEM_T* mat, int8_t row, int8_t col)
-    {
-        int8_t i, j;
-        const char* fmt;
+// Text parameters.
+const float FONT_SCALE = 0.7;
+const int FONT_FACE = FONT_HERSHEY_SIMPLEX;
+const int THICKNESS = 1;
 
-        printf("[DEBUG][%s]<%s>\n\n", __func__, des);
-
-        if(sizeof(ELEM_T) == 8){
-            fmt = "%.8lf\t";
-        }
-        else{
-            fmt = "%.8f\t";
-        }
-
-        for(i = 0; i < row; i++){
-            for(j = 0; j < col; j++) printf(fmt, mat[i * col + j]);
-            puts("");
-        }
-
-        puts("");
-    }
-
-static void print_cov(const char* des, const ELEM_T* cov, int8_t row, int8_t col)
-    {
-        int8_t i, j;
-        const char* fmt;
-
-        printf("[DEBUG][%s]<%s>\n\n", __func__, des);
-
-        if(sizeof(ELEM_T) == 8){
-            fmt = "%.8lf\t";
-        }
-        else{
-            fmt = "%.8f\t";
-        }
-
-        for(i = 0; i < row; i++){
-            for(j = 0; j < col; j++){
-                if(i == j && i < 3) printf(fmt, cov[0]);
-                else if(i == j && i == 3) printf(fmt, cov[1]);
-                else if(i == j && i > 3) printf(fmt, cov[2]);
-                else if(i < kf_delta_num && j == kf_mv_size + i) printf(fmt, cov[3]);
-                else if(kf_mv_size <= i && j == i - kf_mv_size) printf(fmt, cov[3]);
-                else printf(fmt, 0.);        
-            }
-            puts("");
-        }
-
-        puts("");
-    }
+// Colors.
+Scalar BLACK = Scalar(0, 0, 0);
+Scalar BLUE = Scalar(255, 178, 50);
+Scalar YELLOW = Scalar(0, 255, 255);
+Scalar RED = Scalar(0, 0, 255);
 
 
 int main()
 {
+    // Load class list.
+    vector<string> class_list;
+    ifstream ifs("../coco.names");
+    string line;
 
-    kf_init();
-    kf_initialize_track(&det, mean, cov);
-
-    for(index_t i = 0; i < 100; i++){
-        kf_predict(mean, cov);
-
-        det.x1 += 1;
-        det.y1 += 1;
-        det.x2 += 1;
-        det.y2 += 1;
-
-        kf_update(&det, mean, cov);
+    while (getline(ifs, line))
+    {
+        class_list.push_back(line);
     }
 
-    kf_destroy();
+    // Load image.
+    const char *resrcpath = std::getenv("RESOURCE_PATH");
+    auto vid = VideoCapture(resrcpath + string("video/amazon.mp4"));
+    Mat frame, frame_b, frame_p;
 
-    print_mat("mean", mean, 7, 1);
-    print_cov("cov", cov, 7, 7);
+    // Load model.
+    Net net;
+    net = readNet("../models/yolov5s.onnx");
+
+    vector<Mat> detections;
+    det_init();
+
+    if (vid.isOpened())
+    {
+        while ((waitKey(1) & 0xff) != 'q')
+        {
+            if (vid.get(CAP_PROP_FRAME_COUNT) == vid.get(CAP_PROP_POS_FRAMES))
+                break;
+            (void)vid.read(frame);
+            frame.copyTo(frame_b);
+
+            auto s = chrono::high_resolution_clock::now();
+            detections = pre_process(frame, net);
+
+            (void)post_process(frame, frame_b, detections, class_list);
+
+            // Put efficiency information.
+            // The function getPerfProfile returns the overall time for inference(t) and the timings for each of the layers(in layersTimes)
+
+            auto duration = std::chrono::duration_cast<std::chrono::nanoseconds>(chrono::high_resolution_clock::now() - s);
+            string label = format("Inference time : %.2f ms", (float)(duration.count()) / 1000000.);
+            putText(frame, label, Point(20, 40), FONT_FACE, FONT_SCALE, RED);
+
+            hconcat(frame, frame_b, frame_p);
+
+            imshow("Output", frame_p);
+        }
+    }
+
+    det_destroy();
+    destroyAllWindows();
+    vid.release();
 
     return 0;
 }

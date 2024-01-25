@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "iou.h"
+#include <stdio.h>
 
 #ifdef KF_DEBUG
 #include <stdio.h>
@@ -107,8 +108,6 @@ extern "C"{
         }
 
         to_xysr(measurement, mean);
-        //test 용
-        //memcpy(mean, measurement, kf_mv_size * sizeof(ELEM_T));
         
         //initialize covariance
         covariance[3] = 0;
@@ -183,8 +182,6 @@ extern "C"{
 
         //measurement: tlbr -> xysr
         to_xysr(measurement, kf_temp_det);
-        //test 용
-        //memcpy(kf_temp_det, measurement, sizeof(ELEM_T) * kf_mv_size);
 
         //calculate innovation
         for(i = 0; i < kf_mv_size; ++i){

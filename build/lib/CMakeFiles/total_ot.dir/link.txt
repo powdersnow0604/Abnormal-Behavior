@@ -1,0 +1,2 @@
+/usr/bin/ar qc libtotal_ot.a  CMakeFiles/total_ot.dir/customer.cpp.o CMakeFiles/total_ot.dir/detect.cpp.o CMakeFiles/total_ot.dir/hungarian.cpp.o CMakeFiles/total_ot.dir/iou.cpp.o CMakeFiles/total_ot.dir/kalman_filter.cpp.o CMakeFiles/total_ot.dir/tracker.cpp.o
+/usr/bin/ranlib libtotal_ot.a

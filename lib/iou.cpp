@@ -30,7 +30,7 @@ extern "C" {
 		h = max(0, y2 - y1 + 1);
 
 		inter = w * h;
-		iou = inter / (sv_track[2] + box_area_d + inter);
+		iou = inter / (sv_track[2] + box_area_d - inter);
 
 		return iou;
 	}
@@ -39,7 +39,7 @@ extern "C" {
 	{
 		index_t i, j;
 		for(i = 0; i < trk_num; ++i){
-			for(j = 0; j < det_num; ++i){
+			for(j = 0; j < det_num; ++j){
 				cost_mat[i * (uint32_t)ldm + j] = 1 - get_iou(tracks[i].statemean, detections + j);
 			}
 		}

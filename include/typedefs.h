@@ -32,7 +32,7 @@ typedef struct {
 	ELEM_T e4;
 }QELEM_T;
 
-typedef int16_t index_t;
+typedef int32_t index_t;
 
 typedef uint8_t age_t;
 

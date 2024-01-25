@@ -1,13 +1,13 @@
 #include "tracker.h"
-#include "customer.h"
 #include "kalman_filter.h"
 #include "iou.h"
 #include "hungarian.h"
-#include <stdlib.h>
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "errctl.h"
 
 #ifdef _MSC_VER
 #define ALIGNED_ALLOC(align, size) _aligned_malloc((size), (align))
@@ -37,24 +37,37 @@ HungarianAlgorithm hungalgo;
 
 uint32_t track_id = 0;
 
-static inline index_t max(index_t lhs, index_t rhs)
+static inline index_t min(index_t lhs, index_t rhs)
 {
-	return lhs > rhs ? lhs : rhs;
+	return lhs < rhs ? lhs : rhs;
 }
 
 void tk_init(void)
 {
     kf_init();
+
+    tk_track_cnt = 0;
     
     tk_tracks = (customer_t*)ALIGNED_ALLOC(ALIGNMENT, tk_max_tracks * sizeof(customer_t));
+    if(tk_tracks == NULL) err_sys("alloc error tk_track");
+
     tk_matching = (index_t*)ALIGNED_ALLOC(ALIGNMENT, tk_max_tracks * sizeof(index_t));
+    if(tk_matching == NULL) err_sys("alloc error tk_matching");
+
     tk_cost_mat = (ELEM_T*)ALIGNED_ALLOC(ALIGNMENT, tk_max_tracks * tk_max_tracks * sizeof(ELEM_T));
+    if(tk_cost_mat == NULL) err_sys("alloc error tk_cost_mat");
+
     tk_assignment = (index_t*)ALIGNED_ALLOC(ALIGNMENT, tk_max_tracks * sizeof(index_t));
+    if(tk_assignment == NULL) err_sys("alloc error tk_assignment");
+
     tk_unmatched_det_bool = (uint8_t*)ALIGNED_ALLOC(ALIGNMENT, tk_max_tracks * sizeof(uint8_t));
-    tk_track_cnt = 0;
+    if(tk_unmatched_det_bool == NULL) err_sys("alloc error tk_unmatched_det_bool");
 
     tk_tracks[0].statemean = tk_sv_pointer = (ELEM_T*)ALIGNED_ALLOC(ALIGNMENT, tk_max_tracks * kf_sv_size * sizeof(ELEM_T));
+    if(tk_sv_pointer == NULL) err_sys("alloc error statemean");
+
     tk_tracks[0].statecovariance = tk_sc_pointer = (ELEM_T*) ALIGNED_ALLOC(ALIGNMENT, tk_max_tracks * kf_cov_size * sizeof(ELEM_T));
+    if(tk_sc_pointer == NULL) err_sys("alloc error statecovariance");
 
     index_t i;
     for(i = 1; i < tk_max_tracks; ++i){
@@ -82,13 +95,13 @@ void tk_destroy(void)
 
 void tk_create_new_track(const detection_t* detections, index_t num)
 {
-    index_t i, ind = tk_track_cnt == tk_max_tracks ? 0 : tk_track_cnt, cnt = 0;
-
+    index_t i = 0, ind = tk_track_cnt == tk_max_tracks ? 0 : tk_track_cnt, cnt = 0;
+    i += ind; i -=ind;
     //track 의 개수가 max 값을 넘기면, track 배열의 index 0 부터 덮어씌움 새로운 정책 필요
     for(i = 0; i < num; ++i){
         if(tk_unmatched_det_bool[i]){
-            create_customer(tk_tracks + ind, detections + ind, track_id++);
-            ind = (ind + 1) & tk_max_tracks;
+            create_customer(tk_tracks + ind, detections + i, track_id++);
+            ind = (ind + 1) & (tk_max_tracks-1);
             ++cnt;
         }
         else{
@@ -96,7 +109,7 @@ void tk_create_new_track(const detection_t* detections, index_t num)
         }
     }
 
-    tk_track_cnt = max(tk_track_cnt + cnt, tk_max_tracks);
+    tk_track_cnt = min(tk_track_cnt + cnt, tk_max_tracks);
 }
 
 void tk_predict(void)
@@ -120,7 +133,8 @@ void tk_update(const detection_t* detections, index_t num)
         }
         //matched tracks
         else{
-            kf_update(detections + tk_assignment[i] * (uint32_t)kf_mv_size, tk_tracks[i].statemean, tk_tracks[i].statecovariance);
+            kf_update(detections + tk_assignment[i], tk_tracks[i].statemean, tk_tracks[i].statecovariance);
+            tk_tracks[i].age = 0;
             tk_unmatched_det_bool[tk_assignment[i]] = 0;
         }
     }
@@ -144,6 +158,19 @@ void tk_mark_missed(index_t missed)
         --tk_track_cnt;
     }
 }
+
+
+#ifdef TK_DEBUG
+customer_t *tk_get_tracks(void)
+{
+    return tk_tracks;
+}
+
+index_t tk_get_track_num(void)
+{
+    return tk_track_cnt;
+}
+#endif
 
 
 #ifdef __cplusplus
