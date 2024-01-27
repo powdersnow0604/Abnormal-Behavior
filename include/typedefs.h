@@ -7,6 +7,7 @@ extern "C" {
 
 #include <stdint.h>
 #include <math.h>
+#include <float.h>
 
 #ifdef _MSC_VER
 #define ALIGN_ATTR(x) __declspec(align((x)))
@@ -14,11 +15,17 @@ extern "C" {
 #define ALIGN_ATTR(x) __attribute__((aligned((x))))
 #endif
 
+#define ALIGNMENT 64
+
 //functions for ELEM_T
 #define SQRT_T sqrtf
 #define GEMV cblas_sgemv
 #define GEMM cblas_sgemm
 #define POSV LAPACKE_sposv
+
+//epsilon and max for ELEM_T
+#define ELEM_MAX FLT_MAX
+#define ELEM_EPSILON FLT_EPSILON
 
 //should be floating point
 typedef float ELEM_T;
@@ -32,7 +39,7 @@ typedef struct {
 	ELEM_T e4;
 }QELEM_T;
 
-typedef int32_t index_t;
+typedef int16_t index_t;
 
 typedef uint8_t age_t;
 
@@ -43,7 +50,9 @@ const uint8_t kf_cov_size = 4;
 
 //max tracks is also max detections
 //index_t 가 허용 가능한 최대의 양수가 tk_max_tracks * 2 이상이어야 함
-const index_t tk_max_tracks = 64; 
+const index_t tk_max_tracks = 64;
+const index_t tk_max_dets = tk_max_tracks; 
+const index_t tk_max_tracks_log2 = (index_t)log2(tk_max_tracks); 
 
 const ELEM_T iou_threshold = 0.3;
 

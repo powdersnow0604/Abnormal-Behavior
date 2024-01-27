@@ -26,8 +26,8 @@ extern "C" {
 		x2 = min(tlbr_t.e3, sv_det->x2);
 		y2 = min(tlbr_t.e4, sv_det->y2);
 
-		w = max(0, x2 - x1 + 1);
-		h = max(0, y2 - y1 + 1);
+		w = max(0, x2 - x1);
+		h = max(0, y2 - y1);
 
 		inter = w * h;
 		iou = inter / (sv_track[2] + box_area_d - inter);
@@ -35,12 +35,13 @@ extern "C" {
 		return iou;
 	}
 
-	void get_cost_mat_iou(ELEM_T* cost_mat, const customer_t* tracks, const detection_t* detections, index_t trk_num, index_t det_num, index_t ldm)
+	void get_cost_mat_iou(ELEM_T* cost_mat, const customer_t* tracks, const detection_t* detections, index_t trk_num, index_t det_num)
 	{
-		index_t i, j;
-		for(i = 0; i < trk_num; ++i){
-			for(j = 0; j < det_num; ++j){
-				cost_mat[i * (uint32_t)ldm + j] = 1 - get_iou(tracks[i].statemean, detections + j);
+		//row for detections, col for tracks
+		index_t i, j, k = 0;
+		for(j = 0; j < det_num; ++j){
+			for(i = 0; i < trk_num; ++i){
+				cost_mat[k++] = 1 - get_iou(tracks[i].statemean, detections + j);
 			}
 		}
 	}
@@ -68,8 +69,8 @@ extern "C" {
 	{
 		ELEM_T h, w;
 
-		w = tlbr->x2 - tlbr->x1 + 1;
-		h = tlbr->y2 - tlbr->y1 + 1;
+		w = tlbr->x2 - tlbr->x1;
+		h = tlbr->y2 - tlbr->y1;
 
 		xysr[0] = tlbr->x1 + w / 2;
 		xysr[1] = tlbr->y1 + h / 2;

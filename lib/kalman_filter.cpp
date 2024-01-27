@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "iou.h"
-#include <stdio.h>
+
 
 #ifdef KF_DEBUG
 #include <stdio.h>
@@ -21,12 +21,12 @@
 #define ALIGNED_FREE(ptr) free((ptr))
 #endif
 
-#define ALIGNMENT 4
-
 
 #ifdef __cplusplus
 extern "C"{
 #endif
+
+    #include "errctl.h"
     
     static ELEM_T* kf_kalman_gain;
     static ELEM_T* kf_temp_det;
@@ -94,7 +94,10 @@ extern "C"{
     void kf_init(void)
     {
         kf_kalman_gain = (ELEM_T*)ALIGNED_ALLOC(ALIGNMENT, 3 * sizeof(ELEM_T));
+        if(kf_kalman_gain == NULL) err_sys("alloc error kf_kalman_gain");
+
         kf_temp_det = (ELEM_T*)ALIGNED_ALLOC(ALIGNMENT, kf_mv_size * sizeof(ELEM_T));
+        if(kf_temp_det == NULL) err_sys("alloc error kf_temo_det");
     }
 
     void kf_initialize_track(const detection_t* measurement, ELEM_T* mean, ELEM_T* covariance)
@@ -119,9 +122,9 @@ extern "C"{
         covariance[1] = 1e-4;
         covariance[2] = 4 * std_weight_position * covariance[2] * std_weight_position * covariance[2];
         #else
-        covariance[0] = 1; //10
-        covariance[1] = 1; //10
-        covariance[2] = 1; //10000
+        covariance[0] = 10; //1
+        covariance[1] = 10; //1
+        covariance[2] = 10000; //1
         #endif
         
         #ifdef KF_DEBUG
@@ -147,9 +150,9 @@ extern "C"{
         covariance[1] += 1e-4;
         covariance[2] += std_weight_velocity * h * std_weight_position * h;
         #else
-        covariance[0] += 1e-2; //1
-        covariance[1] += 1e-2; //1
-        covariance[2] += 1e-2; //1e-1
+        covariance[0] += 1; //1e-2
+        covariance[1] += 1; //1e-2
+        covariance[2] += 1e-1; //1e-2
         #endif
         
 
@@ -175,9 +178,9 @@ extern "C"{
         kf_kalman_gain[1] = covariance[1] / (covariance[1] + 1e-2);
         kf_kalman_gain[2] = covariance[3] / (covariance[0] + kf_temp_det[0]);
         #else
-        kf_kalman_gain[0] = covariance[0] / (covariance[0] + 1e-1); //1
-        kf_kalman_gain[1] = covariance[1] / (covariance[1] + 1e-1); //10
-        kf_kalman_gain[2] = covariance[3] / (covariance[0] + 1e-1); //1
+        kf_kalman_gain[0] = covariance[0] / (covariance[0] + 1); //1e-1
+        kf_kalman_gain[1] = covariance[1] / (covariance[1] + 10); //1e-1
+        kf_kalman_gain[2] = covariance[3] / (covariance[0] + 1); //1e-1
         #endif
 
         //measurement: tlbr -> xysr

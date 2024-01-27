@@ -127,20 +127,23 @@ Mat post_process(Mat &input_image, Mat &backup_image, vector<Mat> &outputs, cons
     for (size_t i = 0; i < indices.size(); i++)
     {
         int idx = indices[i];
-        Rect box = boxes[idx];
+        if (class_ids[idx] == 0)
+        {
+            Rect box = boxes[idx];
 
-        int left = box.x;
-        int top = box.y;
-        int width = box.width;
-        int height = box.height;
-        // Draw bounding box.
-        rectangle(backup_image, Point(left, top), Point(left + width, top + height), BLUE, 3 * THICKNESS);
+            int left = box.x;
+            int top = box.y;
+            int width = box.width;
+            int height = box.height;
+            // Draw bounding box.
+            rectangle(backup_image, Point(left, top), Point(left + width, top + height), BLUE, 3 * THICKNESS);
 
-        // Get the label for the class name and its confidence.
-        string label = format("%.2f", confidences[idx]);
-        label = class_name[class_ids[idx]] + ":" + label;
-        // Draw class labels.
-        draw_label(backup_image, label, left, top);
+            // Get the label for the class name and its confidence.
+            string label = format("%.2f", confidences[idx]);
+            label = class_name[class_ids[idx]] + ":" + label;
+            // Draw class labels.
+            draw_label(backup_image, label, left, top);
+        }
     }
 
     uint32_t j = 0;
@@ -194,7 +197,6 @@ Mat post_process(Mat &input_image, Mat &backup_image, vector<Mat> &outputs, cons
     putText(input_image, label, Point(input_image.rows - label_size.width + 1, label_size.height), FONT_FACE, FONT_SCALE, RED);
     putText(input_image, label_d, Point(input_image.rows - label_size.width + 1, label_size.height << 1), FONT_FACE, FONT_SCALE, RED);
     putText(input_image, label_f, Point(input_image.rows - label_size.width + 1, label_size.height * 3), FONT_FACE, FONT_SCALE, RED);
-
 
     return input_image;
 }

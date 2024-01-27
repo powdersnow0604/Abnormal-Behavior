@@ -5,7 +5,7 @@ file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS
 
 add_library(total_ot STATIC ${SRC_FILES})
 
-option(DEBUG "using -g flag" ON)
+option(DEBUG "using -g flag" OFF)
 
 # total_ot 의 include 경로 지정
 target_include_directories(total_ot PUBLIC ${CMAKE_SOURCE_DIR}/include /usr/local/include/opencv4 

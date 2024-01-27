@@ -35,3 +35,14 @@
 3. header 에 정의된 모든 const 변수들을 typedefs.h 로 옮김
 4. 동적할당을 aligned_alloc 을 사용하도록 변경
 	1) 일단 alignment 는 tracker-64, kf-4 로 설정함
+5. 박스의 너비, 높이를 구할 때, tlbr 의 차에서 1 을 더하지 않음
+	1) e.g. not box.x2 - box.x1 + 1, but box.x2 - box.x1
+	2) detection 을 거친 좌표이기 때문에 어차피 정수가 아니라 실수이기 때문에
+
+[2024-01-28]
+1. tk_max_tracks 가 2 의 거듭제곱임을 이용한 부분
+	1) tk_create_new_track
+2. 매크로 정리
+	1)KF_DEBUG: 각 행렬 출력
+	2)TK_DEBUG: track pointer 와 track cnt 를 반환하는 함수 정의
+	3)HA_DEBUG: cost matrix 가 전부 음수가 아닌지 확인

@@ -347,7 +347,7 @@ CUDA_nvToolsExt_LIBRARY:FILEPATH=/usr/local/cuda/lib64/libnvToolsExt.so
 CUDA_rt_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/librt.so
 
 //using -g flag
-DEBUG:BOOL=ON
+DEBUG:BOOL=OFF
 
 //Path to a library.
 ERRCTL:FILEPATH=/home/powdersnow/workspace/C_derived/library/lib/liberrctl.so

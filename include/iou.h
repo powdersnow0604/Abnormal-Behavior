@@ -12,7 +12,7 @@ extern "C" {
 	ELEM_T get_iou(ELEM_T* sv_track, const detection_t* sv_det);
 
 	//get cost matrix by iou
-	void get_cost_mat_iou(ELEM_T* cost_mat, const customer_t* tracks, const detection_t* detections, index_t trk_num, index_t det_num, index_t ldm);
+	void get_cost_mat_iou(ELEM_T* cost_mat, const customer_t* tracks, const detection_t* detections, index_t trk_num, index_t det_num);
 
 	//xysr -> tlbr
 	QELEM_T to_tlbr(const ELEM_T* sv);

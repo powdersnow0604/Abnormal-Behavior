@@ -17,6 +17,8 @@ stdint.h
 -
 math.h
 -
+float.h
+-
 
 /home/powdersnow/workspace/C_derived/object_tracking/app/main.cpp
 detect.h

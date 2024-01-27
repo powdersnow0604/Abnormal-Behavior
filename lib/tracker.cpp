@@ -21,21 +21,19 @@ extern "C" {
 #define ALIGNED_FREE(ptr) free((ptr))
 #endif
 
-#define ALIGNMENT 64
 
-customer_t *tk_tracks;
-ELEM_T *tk_sv_pointer;
-ELEM_T *tk_sc_pointer;
-index_t *tk_matching;
-ELEM_T *tk_cost_mat;
-index_t *tk_assignment;
-uint8_t *tk_unmatched_det_bool;
-index_t tk_track_cnt;
+static customer_t *tk_tracks;
+static ELEM_T *tk_sv_pointer;
+static ELEM_T *tk_sc_pointer;
+static index_t *tk_matching;
+static ELEM_T *tk_cost_mat;
+static index_t *tk_assignment;
+static uint8_t *tk_unmatched_det_bool;
+static index_t tk_track_cnt;
 
-void (*get_cost_mat)(ELEM_T* cost_mat, const customer_t* tracks, const detection_t* detections, index_t trk_num, index_t det_num, index_t ldm) = get_cost_mat_iou;
-HungarianAlgorithm hungalgo;
+static void (*get_cost_mat)(ELEM_T* cost_mat, const customer_t* tracks, const detection_t* detections, index_t trk_num, index_t det_num) = get_cost_mat_iou;
 
-uint32_t track_id = 0;
+static uint32_t track_id = 0;
 
 static inline index_t min(index_t lhs, index_t rhs)
 {
@@ -45,6 +43,7 @@ static inline index_t min(index_t lhs, index_t rhs)
 void tk_init(void)
 {
     kf_init();
+    ha_init();
 
     tk_track_cnt = 0;
     
@@ -54,7 +53,7 @@ void tk_init(void)
     tk_matching = (index_t*)ALIGNED_ALLOC(ALIGNMENT, tk_max_tracks * sizeof(index_t));
     if(tk_matching == NULL) err_sys("alloc error tk_matching");
 
-    tk_cost_mat = (ELEM_T*)ALIGNED_ALLOC(ALIGNMENT, tk_max_tracks * tk_max_tracks * sizeof(ELEM_T));
+    tk_cost_mat = (ELEM_T*)ALIGNED_ALLOC(ALIGNMENT, tk_max_tracks * tk_max_dets * sizeof(ELEM_T));
     if(tk_cost_mat == NULL) err_sys("alloc error tk_cost_mat");
 
     tk_assignment = (index_t*)ALIGNED_ALLOC(ALIGNMENT, tk_max_tracks * sizeof(index_t));
@@ -83,6 +82,7 @@ void tk_init(void)
 void tk_destroy(void)
 {
     kf_destroy();
+    ha_destroy();
 
     ALIGNED_FREE(tk_sv_pointer);
     ALIGNED_FREE(tk_sc_pointer);
@@ -95,7 +95,7 @@ void tk_destroy(void)
 
 void tk_create_new_track(const detection_t* detections, index_t num)
 {
-    index_t i = 0, ind = tk_track_cnt == tk_max_tracks ? 0 : tk_track_cnt, cnt = 0;
+    index_t i = 0, ind = tk_track_cnt & (tk_max_tracks - 1), cnt = 0;
     i += ind; i -=ind;
     //track 의 개수가 max 값을 넘기면, track 배열의 index 0 부터 덮어씌움 새로운 정책 필요
     for(i = 0; i < num; ++i){
@@ -122,13 +122,13 @@ void tk_predict(void)
 
 void tk_update(const detection_t* detections, index_t num)
 {
-    get_cost_mat(tk_cost_mat, tk_tracks, detections, tk_track_cnt, num, tk_max_tracks);
-    hungalgo.Solve(tk_cost_mat, tk_assignment, tk_track_cnt, num, tk_max_tracks);
+    get_cost_mat(tk_cost_mat, tk_tracks, detections, tk_track_cnt, num);
+    (void)ha_solve(tk_cost_mat, tk_assignment, tk_track_cnt, num);
 
-    index_t i;
+    index_t i, trk_cnt = tk_track_cnt;
     for(i = tk_track_cnt-1; i >= 0; --i){
         //unmatched tracks
-        if(tk_assignment[i] == -1 || 1 - tk_cost_mat[i * (uint32_t)tk_max_tracks + tk_assignment[i]] < iou_threshold){
+        if(tk_assignment[i] == -1 || 1 - tk_cost_mat[i + trk_cnt * tk_assignment[i]] < iou_threshold){
             tk_mark_missed(i);
         }
         //matched tracks
