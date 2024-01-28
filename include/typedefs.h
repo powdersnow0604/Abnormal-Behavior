@@ -43,19 +43,19 @@ typedef int16_t index_t;
 
 typedef uint8_t age_t;
 
-const uint8_t kf_sv_size = 7;
-const uint8_t kf_mv_size = 4;
-const uint8_t kf_delta_num = kf_sv_size - kf_mv_size;
-const uint8_t kf_cov_size = 4;
+extern const uint8_t kf_sv_size;
+extern const uint8_t kf_mv_size;
+extern const uint8_t kf_delta_num;
+extern const uint8_t kf_cov_size;
 
 //max tracks is also max detections
 //index_t 가 허용 가능한 최대의 양수가 tk_max_tracks * 2 이상이어야 함
-const index_t tk_max_tracks = 64;
-const index_t tk_max_dets = tk_max_tracks;  
+extern const index_t tk_max_tracks;
+extern const index_t tk_max_dets;  
 
-const ELEM_T iou_threshold = 0.3;
+extern const ELEM_T iou_threshold;
 
-const age_t tk_max_age = 1;
+extern const age_t tk_max_age;
 
 typedef struct
 {

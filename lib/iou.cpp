@@ -4,6 +4,9 @@
 extern "C" {
 #endif
 
+	const ELEM_T iou_threshold = 0.3;
+
+
 	static inline ELEM_T max(ELEM_T lhs, ELEM_T rhs)
 	{
 		return lhs > rhs ? lhs : rhs;

@@ -147,7 +147,7 @@ Mat post_process(Mat &input_image, Mat &backup_image, vector<Mat> &outputs, cons
     }
 
     uint32_t j = 0;
-    for (uint32_t i = 0; i < indices.size() && j < tk_max_tracks; i++)
+    for (uint32_t i = 0; i < indices.size() && j < (uint32_t)tk_max_tracks; i++)
     {
         int idx = indices[i];
         if (class_ids[idx] == 0)

@@ -35,6 +35,10 @@ static void (*get_cost_mat)(ELEM_T* cost_mat, const customer_t* tracks, const de
 
 static uint32_t track_id = 0;
 
+const index_t tk_max_tracks = 64;
+const index_t tk_max_dets = tk_max_tracks;
+const age_t tk_max_age = 1;
+
 static inline index_t min(index_t lhs, index_t rhs)
 {
 	return lhs < rhs ? lhs : rhs;

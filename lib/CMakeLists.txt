@@ -33,5 +33,5 @@ find_package(OpenCV REQUIRED)
 target_link_libraries(total_ot ${OpenCV_LIBRARIES})
 
 #errctl
-#find_library(ERRCTL NAMES liberrctl.so PATHS /home/powdersnow/workspace/C_derived/library/lib REQUIRED)
-#target_link_libraries(total_ot ${ERRCTL})
+find_library(ERRCTL NAMES liberrctl.so PATHS /home/powdersnow/workspace/C_derived/library/lib REQUIRED)
+target_link_libraries(total_ot ${ERRCTL})
