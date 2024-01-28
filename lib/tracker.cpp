@@ -160,7 +160,6 @@ void tk_mark_missed(index_t missed)
 }
 
 
-#ifdef TK_DEBUG
 customer_t *tk_get_tracks(void)
 {
     return tk_tracks;
@@ -170,7 +169,6 @@ index_t tk_get_track_num(void)
 {
     return tk_track_cnt;
 }
-#endif
 
 
 #ifdef __cplusplus

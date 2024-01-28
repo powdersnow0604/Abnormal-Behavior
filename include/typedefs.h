@@ -51,8 +51,7 @@ const uint8_t kf_cov_size = 4;
 //max tracks is also max detections
 //index_t 가 허용 가능한 최대의 양수가 tk_max_tracks * 2 이상이어야 함
 const index_t tk_max_tracks = 64;
-const index_t tk_max_dets = tk_max_tracks; 
-const index_t tk_max_tracks_log2 = (index_t)log2(tk_max_tracks); 
+const index_t tk_max_dets = tk_max_tracks;  
 
 const ELEM_T iou_threshold = 0.3;
 

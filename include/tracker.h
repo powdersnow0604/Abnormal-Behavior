@@ -15,12 +15,8 @@ void tk_predict(void);
 void tk_update(const detection_t* detection, index_t num);
 void tk_mark_missed(index_t missed);
 
-#define TK_DEBUG
-#ifdef TK_DEBUG
 customer_t *tk_get_tracks(void);
 index_t tk_get_track_num(void);
-#endif
-
 
 #ifdef __cplusplus
 }
