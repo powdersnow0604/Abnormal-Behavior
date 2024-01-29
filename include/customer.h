@@ -17,8 +17,8 @@ extern "C" {
 		//vector with 4 elements
 		ELEM_T* statecovariance;
 
-		ID_TYPE id;
 		time_t timestamp;
+		ID_TYPE id;
 		age_t age;
 	}customer_t;
 
