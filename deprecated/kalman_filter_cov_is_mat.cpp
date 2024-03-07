@@ -3,6 +3,8 @@
 #include <string.h>
 #include "iou.h"
 
+#define KF_NOPT_MM
+
 #ifdef KF_NOPT_MM
 #include "cblas.h"
 #include "lapacke.h"
@@ -32,6 +34,11 @@ extern "C"{
     static const ELEM_T std_weight_position = 1. / 20;
     static const ELEM_T std_weight_velocity = 1. / 160;
     #endif
+
+    const uint8_t kf_sv_size = 7;
+    const uint8_t kf_mv_size = 4;
+    const uint8_t kf_delta_num = kf_sv_size - kf_mv_size;
+    const uint8_t kf_cov_size = 49;
 
 
     #ifdef KF_DEBUG
@@ -92,7 +99,7 @@ extern "C"{
         #endif
     }
 
-    void kf_initialize_track(const ELEM_T* measurement, ELEM_T* mean, ELEM_T* covariance)
+    void kf_initialize_track(const detection_t* measurement, ELEM_T* mean, ELEM_T* covariance)
     {
         //measurement 는 tlbr 로 입력되는 것을 상정
         index_t i;
@@ -101,8 +108,7 @@ extern "C"{
             mean[i] = 0;
         }
 
-        //to_xysr(measurement, mean);
-        memcpy(mean, measurement, kf_mv_size * sizeof(ELEM_T));
+        to_xysr(measurement, mean);
 
         memset(covariance, 0, kf_sv_size * kf_sv_size * sizeof(ELEM_T));
 
@@ -238,15 +244,14 @@ extern "C"{
     }
 
 
-    void kf_update(const ELEM_T* measurement, ELEM_T* mean, ELEM_T* covariance)
+    void kf_update(const detection_t* measurement, ELEM_T* mean, ELEM_T* covariance)
     {
         //measurement 는 tlbr 로 입력되는 것을 상정
-        //to_xysr(measurement, kf_temp_det);
-        memcpy(kf_temp_det, measurement, sizeof(ELEM_T) * kf_mv_size);
+        to_xysr(measurement, kf_temp_det);
 
         kf_project(mean, covariance);
 
-        index_t i, j;
+        index_t i;
         for(i = 0; i < kf_mv_size; ++i){
             kf_temp_det[i] -= mean[i];
         }
@@ -261,6 +266,8 @@ extern "C"{
         kf_kalman_gain[26] = covariance[44] / kf_projected_cov[10];
         kf_kalman_gain[15] = covariance[24] / kf_projected_cov[15];
         */
+
+        index_t j;
 
         for(i = 0, j = 0; i < kf_mv_size * kf_mv_size; i += kf_mv_size + 1, j += kf_sv_size + 1){
             kf_kalman_gain[i] = covariance[j] / kf_projected_cov[i];

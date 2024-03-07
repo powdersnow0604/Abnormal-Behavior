@@ -57,9 +57,22 @@ include lib/CMakeFiles/total_ot.dir/progress.make
 # Include the compile flags for this target's objects.
 include lib/CMakeFiles/total_ot.dir/flags.make
 
+lib/CMakeFiles/total_ot.dir/bool_vector.cpp.o: lib/CMakeFiles/total_ot.dir/flags.make
+lib/CMakeFiles/total_ot.dir/bool_vector.cpp.o: ../lib/bool_vector.cpp
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object lib/CMakeFiles/total_ot.dir/bool_vector.cpp.o"
+	cd /home/powdersnow/workspace/C_derived/object_tracking/build/lib && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/total_ot.dir/bool_vector.cpp.o -c /home/powdersnow/workspace/C_derived/object_tracking/lib/bool_vector.cpp
+
+lib/CMakeFiles/total_ot.dir/bool_vector.cpp.i: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Preprocessing CXX source to CMakeFiles/total_ot.dir/bool_vector.cpp.i"
+	cd /home/powdersnow/workspace/C_derived/object_tracking/build/lib && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -E /home/powdersnow/workspace/C_derived/object_tracking/lib/bool_vector.cpp > CMakeFiles/total_ot.dir/bool_vector.cpp.i
+
+lib/CMakeFiles/total_ot.dir/bool_vector.cpp.s: cmake_force
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green "Compiling CXX source to assembly CMakeFiles/total_ot.dir/bool_vector.cpp.s"
+	cd /home/powdersnow/workspace/C_derived/object_tracking/build/lib && /usr/bin/c++ $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -S /home/powdersnow/workspace/C_derived/object_tracking/lib/bool_vector.cpp -o CMakeFiles/total_ot.dir/bool_vector.cpp.s
+
 lib/CMakeFiles/total_ot.dir/customer.cpp.o: lib/CMakeFiles/total_ot.dir/flags.make
 lib/CMakeFiles/total_ot.dir/customer.cpp.o: ../lib/customer.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Building CXX object lib/CMakeFiles/total_ot.dir/customer.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object lib/CMakeFiles/total_ot.dir/customer.cpp.o"
 	cd /home/powdersnow/workspace/C_derived/object_tracking/build/lib && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/total_ot.dir/customer.cpp.o -c /home/powdersnow/workspace/C_derived/object_tracking/lib/customer.cpp
 
 lib/CMakeFiles/total_ot.dir/customer.cpp.i: cmake_force
@@ -72,7 +85,7 @@ lib/CMakeFiles/total_ot.dir/customer.cpp.s: cmake_force
 
 lib/CMakeFiles/total_ot.dir/detect.cpp.o: lib/CMakeFiles/total_ot.dir/flags.make
 lib/CMakeFiles/total_ot.dir/detect.cpp.o: ../lib/detect.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_2) "Building CXX object lib/CMakeFiles/total_ot.dir/detect.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object lib/CMakeFiles/total_ot.dir/detect.cpp.o"
 	cd /home/powdersnow/workspace/C_derived/object_tracking/build/lib && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/total_ot.dir/detect.cpp.o -c /home/powdersnow/workspace/C_derived/object_tracking/lib/detect.cpp
 
 lib/CMakeFiles/total_ot.dir/detect.cpp.i: cmake_force
@@ -85,7 +98,7 @@ lib/CMakeFiles/total_ot.dir/detect.cpp.s: cmake_force
 
 lib/CMakeFiles/total_ot.dir/hungarian.cpp.o: lib/CMakeFiles/total_ot.dir/flags.make
 lib/CMakeFiles/total_ot.dir/hungarian.cpp.o: ../lib/hungarian.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_3) "Building CXX object lib/CMakeFiles/total_ot.dir/hungarian.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object lib/CMakeFiles/total_ot.dir/hungarian.cpp.o"
 	cd /home/powdersnow/workspace/C_derived/object_tracking/build/lib && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/total_ot.dir/hungarian.cpp.o -c /home/powdersnow/workspace/C_derived/object_tracking/lib/hungarian.cpp
 
 lib/CMakeFiles/total_ot.dir/hungarian.cpp.i: cmake_force
@@ -98,7 +111,7 @@ lib/CMakeFiles/total_ot.dir/hungarian.cpp.s: cmake_force
 
 lib/CMakeFiles/total_ot.dir/iou.cpp.o: lib/CMakeFiles/total_ot.dir/flags.make
 lib/CMakeFiles/total_ot.dir/iou.cpp.o: ../lib/iou.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_4) "Building CXX object lib/CMakeFiles/total_ot.dir/iou.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object lib/CMakeFiles/total_ot.dir/iou.cpp.o"
 	cd /home/powdersnow/workspace/C_derived/object_tracking/build/lib && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/total_ot.dir/iou.cpp.o -c /home/powdersnow/workspace/C_derived/object_tracking/lib/iou.cpp
 
 lib/CMakeFiles/total_ot.dir/iou.cpp.i: cmake_force
@@ -111,7 +124,7 @@ lib/CMakeFiles/total_ot.dir/iou.cpp.s: cmake_force
 
 lib/CMakeFiles/total_ot.dir/kalman_filter.cpp.o: lib/CMakeFiles/total_ot.dir/flags.make
 lib/CMakeFiles/total_ot.dir/kalman_filter.cpp.o: ../lib/kalman_filter.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_5) "Building CXX object lib/CMakeFiles/total_ot.dir/kalman_filter.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object lib/CMakeFiles/total_ot.dir/kalman_filter.cpp.o"
 	cd /home/powdersnow/workspace/C_derived/object_tracking/build/lib && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/total_ot.dir/kalman_filter.cpp.o -c /home/powdersnow/workspace/C_derived/object_tracking/lib/kalman_filter.cpp
 
 lib/CMakeFiles/total_ot.dir/kalman_filter.cpp.i: cmake_force
@@ -124,7 +137,7 @@ lib/CMakeFiles/total_ot.dir/kalman_filter.cpp.s: cmake_force
 
 lib/CMakeFiles/total_ot.dir/tracker.cpp.o: lib/CMakeFiles/total_ot.dir/flags.make
 lib/CMakeFiles/total_ot.dir/tracker.cpp.o: ../lib/tracker.cpp
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_6) "Building CXX object lib/CMakeFiles/total_ot.dir/tracker.cpp.o"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Building CXX object lib/CMakeFiles/total_ot.dir/tracker.cpp.o"
 	cd /home/powdersnow/workspace/C_derived/object_tracking/build/lib && /usr/bin/c++  $(CXX_DEFINES) $(CXX_INCLUDES) $(CXX_FLAGS) -o CMakeFiles/total_ot.dir/tracker.cpp.o -c /home/powdersnow/workspace/C_derived/object_tracking/lib/tracker.cpp
 
 lib/CMakeFiles/total_ot.dir/tracker.cpp.i: cmake_force
@@ -137,6 +150,7 @@ lib/CMakeFiles/total_ot.dir/tracker.cpp.s: cmake_force
 
 # Object files for target total_ot
 total_ot_OBJECTS = \
+"CMakeFiles/total_ot.dir/bool_vector.cpp.o" \
 "CMakeFiles/total_ot.dir/customer.cpp.o" \
 "CMakeFiles/total_ot.dir/detect.cpp.o" \
 "CMakeFiles/total_ot.dir/hungarian.cpp.o" \
@@ -147,6 +161,7 @@ total_ot_OBJECTS = \
 # External object files for target total_ot
 total_ot_EXTERNAL_OBJECTS =
 
+lib/libtotal_ot.a: lib/CMakeFiles/total_ot.dir/bool_vector.cpp.o
 lib/libtotal_ot.a: lib/CMakeFiles/total_ot.dir/customer.cpp.o
 lib/libtotal_ot.a: lib/CMakeFiles/total_ot.dir/detect.cpp.o
 lib/libtotal_ot.a: lib/CMakeFiles/total_ot.dir/hungarian.cpp.o
@@ -155,7 +170,7 @@ lib/libtotal_ot.a: lib/CMakeFiles/total_ot.dir/kalman_filter.cpp.o
 lib/libtotal_ot.a: lib/CMakeFiles/total_ot.dir/tracker.cpp.o
 lib/libtotal_ot.a: lib/CMakeFiles/total_ot.dir/build.make
 lib/libtotal_ot.a: lib/CMakeFiles/total_ot.dir/link.txt
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_7) "Linking CXX static library libtotal_ot.a"
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --green --bold --progress-dir=/home/powdersnow/workspace/C_derived/object_tracking/build/CMakeFiles --progress-num=$(CMAKE_PROGRESS_8) "Linking CXX static library libtotal_ot.a"
 	cd /home/powdersnow/workspace/C_derived/object_tracking/build/lib && $(CMAKE_COMMAND) -P CMakeFiles/total_ot.dir/cmake_clean_target.cmake
 	cd /home/powdersnow/workspace/C_derived/object_tracking/build/lib && $(CMAKE_COMMAND) -E cmake_link_script CMakeFiles/total_ot.dir/link.txt --verbose=$(VERBOSE)
 

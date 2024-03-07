@@ -6,5 +6,5 @@ CXX_FLAGS = -g   -Wall -Werror
 
 CXX_DEFINES = 
 
-CXX_INCLUDES = -I/home/powdersnow/workspace/C_derived/object_tracking/include -I/home/powdersnow/workspace/C_derived/object_tracking/../library/include -isystem /usr/local/include/opencv4 
+CXX_INCLUDES = -I/home/powdersnow/workspace/C_derived/object_tracking/include -I/home/powdersnow/workspace/C_derived/object_tracking/../library/include -I/home/powdersnow/workspace/C_derived/library/OpenBLAS/include -isystem /usr/local/include/opencv4 
 

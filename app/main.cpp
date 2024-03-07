@@ -1,6 +1,7 @@
 #include "detect.h"
 #include <fstream>
 #include <chrono>
+#include <unistd.h>
 
 
 using namespace std;
@@ -32,25 +33,51 @@ int main()
         class_list.push_back(line);
     }
 
+    string vidpath[2] = {string("video/MOT17-03-SDP-raw.webm"), string("video/amazon.mp4")};
+
     // Load image.
     const char *resrcpath = std::getenv("RESOURCE_PATH");
-    auto vid = VideoCapture(resrcpath + string("video/amazon.mp4"));
+    auto vid = VideoCapture(resrcpath + vidpath[0]);
+    auto res = VideoWriter();
+
     Mat frame, frame_b, frame_p;
 
     // Load model.
     Net net;
-    net = readNet("../models/yolov5s.onnx");
+    net = readNet("../models/yolov5m.onnx");
+
+    float videoFPS = vid.get(cv::CAP_PROP_FPS);
+	int videoWidth = vid.get(cv::CAP_PROP_FRAME_WIDTH);
+	int videoHeight = vid.get(cv::CAP_PROP_FRAME_HEIGHT);
+
+    string output_path = resrcpath + string("video/otres.mp4");
+    if(access(output_path.c_str(), F_OK) == 0){
+        remove(output_path.c_str());
+    }
+
+    res.open(output_path, cv::VideoWriter::fourcc('m', 'p', '4', 'v'),
+    videoFPS , cv::Size(videoWidth << 1, videoHeight), true);
 
     vector<Mat> detections;
-    det_init();
+    det_init(videoWidth, videoHeight);
+    //det_init();
 
-    if (vid.isOpened())
+    auto total_s = chrono::high_resolution_clock::now();
+
+    //vid.set(CAP_PROP_POS_FRAMES, 350);
+
+    uint8_t key;
+
+    if (vid.isOpened() && res.isOpened())
     {
-        while ((waitKey(1) & 0xff) != 'q')
+        while ((key = (waitKey(1) & 0xff)) != 'q')
         {
+            if(key == 'w') waitKey();
+
             if (vid.get(CAP_PROP_FRAME_COUNT) == vid.get(CAP_PROP_POS_FRAMES))
                 break;
-            (void)vid.read(frame);
+
+            vid >> frame;
             frame.copyTo(frame_b);
 
             auto s = chrono::high_resolution_clock::now();
@@ -68,12 +95,21 @@ int main()
             hconcat(frame, frame_b, frame_p);
 
             imshow("Output", frame_p);
+            res << frame_p;
         }
     }
+    else{
+        cerr << "open error\n";
+    }
+
+    auto total_duration = std::chrono::duration_cast<std::chrono::nanoseconds>(chrono::high_resolution_clock::now() - total_s);
+    printf("total time = %.2f ms\n", (float)(total_duration.count()) / 1000000.);
+    printf("fps = %f\n", vid.get(CAP_PROP_POS_FRAMES) / ((float)(total_duration.count() / 1000000000.)));
 
     det_destroy();
-    destroyAllWindows();
+    cv::destroyAllWindows();
     vid.release();
+    res.release();
 
     return 0;
 }

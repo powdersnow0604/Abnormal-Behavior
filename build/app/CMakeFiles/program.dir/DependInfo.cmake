@@ -12,6 +12,7 @@ set(CMAKE_CXX_COMPILER_ID "GNU")
 set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "../include"
   "../../library/include"
+  "/home/powdersnow/workspace/C_derived/library/OpenBLAS/include"
   "/usr/local/include/opencv4"
   )
 

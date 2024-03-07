@@ -19,7 +19,11 @@ extern "C" {
 
 		time_t timestamp;
 		ID_TYPE id;
-		age_t age;
+		age_t age : 6;
+		age_t is_occluded : 1;
+		age_t is_stable : 1;
+		uint8_t tso; //time since observed
+		uint8_t cmf; //continuous matched frmaes
 	}customer_t;
 
 	void create_customer(customer_t* customer, const detection_t* detection, ID_TYPE _id);

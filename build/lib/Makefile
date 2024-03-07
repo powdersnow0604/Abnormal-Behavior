@@ -126,6 +126,33 @@ total_ot/fast:
 	cd /home/powdersnow/workspace/C_derived/object_tracking/build && $(MAKE) -f lib/CMakeFiles/total_ot.dir/build.make lib/CMakeFiles/total_ot.dir/build
 .PHONY : total_ot/fast
 
+bool_vector.o: bool_vector.cpp.o
+
+.PHONY : bool_vector.o
+
+# target to build an object file
+bool_vector.cpp.o:
+	cd /home/powdersnow/workspace/C_derived/object_tracking/build && $(MAKE) -f lib/CMakeFiles/total_ot.dir/build.make lib/CMakeFiles/total_ot.dir/bool_vector.cpp.o
+.PHONY : bool_vector.cpp.o
+
+bool_vector.i: bool_vector.cpp.i
+
+.PHONY : bool_vector.i
+
+# target to preprocess a source file
+bool_vector.cpp.i:
+	cd /home/powdersnow/workspace/C_derived/object_tracking/build && $(MAKE) -f lib/CMakeFiles/total_ot.dir/build.make lib/CMakeFiles/total_ot.dir/bool_vector.cpp.i
+.PHONY : bool_vector.cpp.i
+
+bool_vector.s: bool_vector.cpp.s
+
+.PHONY : bool_vector.s
+
+# target to generate assembly for a file
+bool_vector.cpp.s:
+	cd /home/powdersnow/workspace/C_derived/object_tracking/build && $(MAKE) -f lib/CMakeFiles/total_ot.dir/build.make lib/CMakeFiles/total_ot.dir/bool_vector.cpp.s
+.PHONY : bool_vector.cpp.s
+
 customer.o: customer.cpp.o
 
 .PHONY : customer.o
@@ -297,6 +324,9 @@ help:
 	@echo "... rebuild_cache"
 	@echo "... edit_cache"
 	@echo "... total_ot"
+	@echo "... bool_vector.o"
+	@echo "... bool_vector.i"
+	@echo "... bool_vector.s"
 	@echo "... customer.o"
 	@echo "... customer.i"
 	@echo "... customer.s"

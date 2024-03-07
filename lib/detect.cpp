@@ -27,6 +27,7 @@ static Scalar BLUE = Scalar(255, 178, 50);
 static Scalar YELLOW = Scalar(0, 255, 255);
 static Scalar RED = Scalar(0, 0, 255);
 
+
 // boxes
 detection_t *det_boxes;
 
@@ -138,11 +139,11 @@ Mat post_process(Mat &input_image, Mat &backup_image, vector<Mat> &outputs, cons
             // Draw bounding box.
             rectangle(backup_image, Point(left, top), Point(left + width, top + height), BLUE, 3 * THICKNESS);
 
-            // Get the label for the class name and its confidence.
-            string label = format("%.2f", confidences[idx]);
-            label = class_name[class_ids[idx]] + ":" + label;
-            // Draw class labels.
-            draw_label(backup_image, label, left, top);
+            // // Get the label for the class name and its confidence.
+            // string label = format("%.2f", confidences[idx]);
+            // label = class_name[class_ids[idx]] + ":" + label;
+            // // Draw class labels.
+            // draw_label(backup_image, label, left, top);
         }
     }
 
@@ -183,12 +184,25 @@ Mat post_process(Mat &input_image, Mat &backup_image, vector<Mat> &outputs, cons
         QELEM_T tlbr = to_tlbr(tracks[i].statemean);
 
         // Draw bounding box.
-        rectangle(input_image, Point(tlbr.e1, tlbr.e2), Point(tlbr.e3, tlbr.e4), BLUE, 3 * THICKNESS);
+        Scalar color = 0;
+        if(tracks[i].is_occluded){
+            color = RED;
+        }
+        else if(tracks[i].is_stable){
+            color = BLUE;
+        }
+        else{
+            color = Scalar(255, 255, 0);
+        }
+
+        rectangle(input_image, Point(tlbr.e1, tlbr.e2), Point(tlbr.e3, tlbr.e4), color, 3 * THICKNESS);
         // printf("[frame %d]customer found at x1=%lf y1=%lf x2=%lf y2=%lf\n", frame_cnt, tlbr.e1, tlbr.e2, tlbr.e3, tlbr.e4);
 
         // Draw class labels.
         draw_label(input_image, to_string(tracks[i].id), tlbr.e1, tlbr.e2);
     }
+
+    
     string label = format("current tracks: %d", tk_get_track_num());
     string label_d = format("current detection: %d", det_num);
     string label_f = format("current frame: %u", frame_cnt);
@@ -201,9 +215,9 @@ Mat post_process(Mat &input_image, Mat &backup_image, vector<Mat> &outputs, cons
     return input_image;
 }
 
-void det_init()
+void det_init(int img_width, int img_height)
 {
-    tk_init();
+    tk_init(img_width, img_height);
     det_boxes = (detection_t *)malloc(tk_max_tracks * sizeof(detection_t));
 }
 

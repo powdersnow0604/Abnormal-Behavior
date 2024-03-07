@@ -14,6 +14,7 @@ endif()
 # SRC_FILES at lib/CMakeLists.txt:2 (file)
 file(GLOB_RECURSE NEW_GLOB LIST_DIRECTORIES false "/home/powdersnow/workspace/C_derived/object_tracking/lib/*.cpp")
 set(OLD_GLOB
+  "/home/powdersnow/workspace/C_derived/object_tracking/lib/bool_vector.cpp"
   "/home/powdersnow/workspace/C_derived/object_tracking/lib/customer.cpp"
   "/home/powdersnow/workspace/C_derived/object_tracking/lib/detect.cpp"
   "/home/powdersnow/workspace/C_derived/object_tracking/lib/hungarian.cpp"

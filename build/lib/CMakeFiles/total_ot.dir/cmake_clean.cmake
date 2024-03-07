@@ -1,4 +1,5 @@
 file(REMOVE_RECURSE
+  "CMakeFiles/total_ot.dir/bool_vector.cpp.o"
   "CMakeFiles/total_ot.dir/customer.cpp.o"
   "CMakeFiles/total_ot.dir/detect.cpp.o"
   "CMakeFiles/total_ot.dir/hungarian.cpp.o"

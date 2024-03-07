@@ -117,6 +117,7 @@ program_EXTERNAL_OBJECTS =
 ../bin/program: /usr/local/lib/libopencv_xfeatures2d.so.4.9.0
 ../bin/program: /usr/local/lib/libopencv_xobjdetect.so.4.9.0
 ../bin/program: /usr/local/lib/libopencv_xphoto.so.4.9.0
+../bin/program: /home/powdersnow/workspace/C_derived/library/OpenBLAS/lib/libopenblas.so
 ../bin/program: /usr/local/lib/libopencv_gapi.so.4.9.0
 ../bin/program: /usr/local/lib/libopencv_stitching.so.4.9.0
 ../bin/program: /usr/local/lib/libopencv_alphamat.so.4.9.0
