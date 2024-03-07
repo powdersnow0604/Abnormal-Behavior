@@ -46,3 +46,6 @@
 	1)KF_DEBUG: 각 행렬 출력
 	2)TK_DEBUG: track pointer 와 track cnt 를 반환하는 함수 정의
 	3)HA_DEBUG: cost matrix 가 전부 음수가 아닌지 확인
+
+[2024-02-25]
+1. hungarian 에서 bool vector 를 memset 하는데 각 frame 당 (nOfColumns + (-nOfColumns & 0x07)) * sizeof(uint8_t) >> 3 만큼의 연산을 함 만약 속도 계선이 필요하면 개선을 고려할 여지가 있음(raise issue, x)
