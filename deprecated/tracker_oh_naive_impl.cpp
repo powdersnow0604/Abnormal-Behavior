@@ -36,28 +36,29 @@ extern "C"
     static index_t *tk_unmatched_dets;
     static uint32_t tk_img_width;
     static uint32_t tk_img_height;
+    static ELEM_T tk_conf_obj_thresh = 0.75;
+    static ELEM_T tk_conf_trk_thresh = 0.35;
+    static ELEM_T tk_cp_thresh = 0.3;
 
     static void (*get_cost_mat)(ELEM_T *cost_mat, const customer_t *tracks, const detection_t *detections, index_t trk_num, index_t det_num) = get_cost_mat_iou;
 
-    static uint16_t track_id = 0;
+    static uint32_t track_id = 0;
 
     const index_t tk_max_tracks = 64;
     const index_t tk_max_dets = tk_max_tracks;
     const age_t tk_max_age = 1;
-    const age_t tk_max_occ_age = 30;
-    const ELEM_T tk_img_rng_factor = 0.1;
+    const age_t tk_max_occ_age = 3;
 
-    static inline index_t min(int32_t lhs, int32_t rhs)
+    static inline index_t min(index_t lhs, index_t rhs)
     {
         return lhs < rhs ? lhs : rhs;
     }
 
     static inline ELEM_T get_avg_area()
     {
-        customer_t *iter = tk_tracks, *end = tk_tracks + tk_track_cnt;
+        customer_t* iter = tk_tracks, *end = tk_tracks + tk_track_cnt;
         ELEM_T avg_area = 0;
-        for (; iter < end; iter++)
-        {
+        for(;iter < end; iter++){
             avg_area += iter->statemean[2];
         }
 
@@ -154,7 +155,7 @@ extern "C"
             }
         }
 
-        tk_track_cnt = min((int32_t)(tk_track_cnt) + cnt, tk_max_tracks);
+        tk_track_cnt = min(tk_track_cnt + cnt, tk_max_tracks);
     }
 
     void tk_predict(void)
@@ -184,28 +185,13 @@ extern "C"
             // unmatched tracks
             if (tk_assignment[i] == -1 || 1 - tk_cost_mat[i + trk_cnt * tk_assignment[i]] < iou_threshold)
             {
-                // tk_unmatched_tracks[um_trk_cnt++] = i;
-                if (tk_img_width * tk_img_rng_factor < tk_tracks[i].statemean[0] &&
-                    tk_img_height * tk_img_rng_factor < tk_tracks[i].statemean[1] &&
-                    tk_img_width * (1 - tk_img_rng_factor) > tk_tracks[i].statemean[0] &&
-                    tk_img_height * (1 - tk_img_rng_factor) > tk_tracks[i].statemean[1] && (tk_tracks[i].is_stable || tk_tracks[i].is_occluded))
-                {
-                    tk_unmatched_tracks[um_trk_cnt++] = i;
-                }
-                else
-                {
-                    tk_mark_missed(i);
-                }
+                tk_unmatched_tracks[um_trk_cnt++] = i;
             }
             // matched tracks
             else
             {
                 kf_update(detections + tk_assignment[i], tk_tracks[i].statemean, tk_tracks[i].statecovariance);
                 tk_tracks[i].age = 0;
-                if (++(tk_tracks[i].cmf) == 4)
-                    tk_tracks[i].is_stable = 1;
-                tk_tracks[i].is_occluded = 0;
-
                 bv_clear(tk_unmatched_det_bool, tk_assignment[i]);
             }
         }
@@ -225,30 +211,32 @@ extern "C"
                 get_cost_mat_ext_iou(tk_cost_mat, tk_tracks, detections, tk_unmatched_tracks, tk_unmatched_dets, um_trk_cnt, um_det_cnt);
                 (void)ha_solve(tk_cost_mat, tk_assignment, um_trk_cnt, um_det_cnt);
 
+                ELEM_T avg_area = get_avg_area();
                 trk_cnt = um_trk_cnt;
                 for (i = 0; i < um_trk_cnt; i++)
                 {
                     // unmatched tracks
                     if (tk_assignment[i] == -1 || 1 - tk_cost_mat[i + trk_cnt * tk_assignment[i]] < iou_threshold)
                     {
-                        tk_mark_occluded(tk_unmatched_tracks[i]);
+                        ELEM_T conf = get_confidence(tk_tracks + tk_unmatched_tracks[i], avg_area, 10);
+                        if (get_cp(tk_tracks + tk_unmatched_tracks[i], tk_tracks, tk_track_cnt, tk_cp_thresh) > tk_cp_thresh && conf > tk_conf_trk_thresh)
+                        {
+                            tk_mark_occluded(tk_unmatched_tracks[i]);
+                        }
+                        else if (conf > tk_conf_obj_thresh)
+                        {
+                            tk_mark_occluded(tk_unmatched_tracks[i]);
+                        }
+                        else
+                        {
+                            tk_mark_missed(tk_unmatched_tracks[i]);
+                        }
                     }
                     // matched tracks
                     else
                     {
-                        // kf_update(detections + tk_unmatched_dets[tk_assignment[i]], tk_tracks[tk_unmatched_tracks[i]].statemean, tk_tracks[tk_unmatched_tracks[i]].statecovariance);
-                        tk_tracks[tk_unmatched_tracks[i]].is_occluded = 0;
+                        kf_update(detections + tk_unmatched_dets[tk_assignment[i]], tk_tracks[tk_unmatched_tracks[i]].statemean, tk_tracks[tk_unmatched_tracks[i]].statecovariance);
                         tk_tracks[tk_unmatched_tracks[i]].age = 0;
-                        tk_tracks[tk_unmatched_tracks[i]].is_stable = 0;
-                        tk_tracks[tk_unmatched_tracks[i]].cmf = 0;
-                        to_xysr(detections + tk_unmatched_dets[tk_assignment[i]], tk_tracks[tk_unmatched_tracks[i]].statemean);
-                        tk_tracks[tk_unmatched_tracks[i]].statemean[4] = 0;
-                        tk_tracks[tk_unmatched_tracks[i]].statemean[5] = 0;
-                        tk_tracks[tk_unmatched_tracks[i]].statemean[6] = 0;
-                        tk_tracks[tk_unmatched_tracks[i]].statecovariance[0] = 10;
-                        tk_tracks[tk_unmatched_tracks[i]].statecovariance[1] = 10;
-                        tk_tracks[tk_unmatched_tracks[i]].statecovariance[2] = 10000;
-                        tk_tracks[tk_unmatched_tracks[i]].statecovariance[3] = 0;
                         bv_clear(tk_unmatched_det_bool, tk_unmatched_dets[tk_assignment[i]]);
                     }
                 }
@@ -256,9 +244,24 @@ extern "C"
             else
             {
                 index_t *iter = tk_unmatched_tracks, *end = tk_unmatched_tracks + um_trk_cnt;
+                ELEM_T avg_area = get_avg_area();
                 for (; iter < end; iter++)
                 {
-                    tk_mark_occluded(*iter);
+                    // tk_mark_missed(*iter);
+
+                    ELEM_T conf = get_confidence(tk_tracks + *iter, avg_area, 10);
+                    if (get_cp(tk_tracks + *iter, tk_tracks, tk_track_cnt, tk_cp_thresh) > tk_cp_thresh && conf > tk_conf_trk_thresh)
+                    {
+                        tk_mark_occluded(*iter);
+                    }
+                    else if (conf > tk_conf_obj_thresh)
+                    {
+                        tk_mark_occluded(*iter);
+                    }
+                    else
+                    {
+                        tk_mark_missed(*iter);
+                    }
                 }
             }
         }
@@ -269,7 +272,6 @@ extern "C"
 
     void tk_mark_missed(index_t missed)
     {
-        tk_tracks[missed].cmf = 0;
         ++(tk_tracks[missed].age);
 
         if (tk_tracks[missed].age > tk_max_age)
@@ -280,42 +282,27 @@ extern "C"
 
     void tk_mark_occluded(index_t occ)
     {
-        if (tk_tracks[occ].is_occluded)
+        if (tk_tracks[occ].age & 0x80)
         {
             ++(tk_tracks[occ].age);
 
-            if (abs(tk_tracks[occ].statemean[4]) < 0.2 && abs(tk_tracks[occ].statemean[4]) < 0.25)
+            if ((tk_tracks[occ].age & 0x7f) > tk_max_occ_age)
             {
-                if (tk_tracks[occ].age > 40)
-                {
-                    tk_delete_track(occ);
-                }
-                else
-                {
-                    tk_tracks[occ].statemean[6] /= 2;
-                }
+                tk_delete_track(occ);
             }
             else
             {
-                if (tk_tracks[occ].age > tk_max_occ_age)
-                {
-                    tk_delete_track(occ);
-                }
-                else
-                {
-                    tk_tracks[occ].statemean[6] /= 2;
-                }
+                tk_tracks[occ].statemean[4] = 0;
+                tk_tracks[occ].statemean[5] = 0;
+                tk_tracks[occ].statemean[6] /= 2;
             }
         }
         else
         {
-            tk_tracks[occ].is_occluded = 1;
-            tk_tracks[occ].age = 0;
-            tk_tracks[occ].statemean[6] /= 1.5;
-            tk_tracks[occ].statemean[5] /= 1.5;
-            tk_tracks[occ].statemean[4] /= 1.5;
-            tk_tracks[occ].cmf = 0;
-            tk_tracks[occ].is_stable = 0;
+            tk_tracks[occ].age = 0x80;
+            tk_tracks[occ].statemean[4] = 0;
+            tk_tracks[occ].statemean[5] = 0;
+            tk_tracks[occ].statemean[6] /= 2;
         }
     }
 

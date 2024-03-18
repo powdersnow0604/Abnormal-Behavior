@@ -57,8 +57,6 @@ extern const ELEM_T iou_threshold;
 
 extern const age_t tk_max_age;
 
-extern const index_t occ_max_cnt;
-
 typedef struct
 {
     ELEM_T x1;                               /**< top-left corner: x */
