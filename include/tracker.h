@@ -14,7 +14,8 @@ void tk_create_new_track(const detection_t* detections, index_t num);
 void tk_predict(void);
 void tk_update(const detection_t* detection, index_t num);
 void tk_mark_missed(index_t missed);
-void tk_delete_track(index_t ind);
+void tk_delete_track_normal(index_t ind);
+void tk_delete_track_occ(index_t ind);
 void tk_mark_occluded(index_t occ);
 
 customer_t *tk_get_tracks(void);
