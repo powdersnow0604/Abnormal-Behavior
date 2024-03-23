@@ -11,6 +11,12 @@ extern "C" {
 	//get iou between single track and single detection
 	ELEM_T get_iou(ELEM_T* sv_track, const detection_t* sv_det);
 
+	//get iou between single track and single occlusion point
+	ELEM_T get_iou_occ_track(ELEM_T* sv_track, const occlusion_point* occ);
+
+	//get iou between single detection and single occlusion point
+	ELEM_T get_iou_occ_det(detection_t* det, const occlusion_point* occ);
+
 	//get extended iou between single track and single detection
 	ELEM_T get_ext_iou(ELEM_T* sv_track, const detection_t* sv_det, ELEM_T ext_w, ELEM_T ext_h);
 

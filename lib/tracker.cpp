@@ -4,6 +4,7 @@
 #include "hungarian.h"
 #include "bool_vector.h"
 #include "occlusion.h"
+#include "errctl.h"
 #include <string.h>
 
 #ifdef __cplusplus
@@ -11,7 +12,6 @@ extern "C"
 {
 #endif
 
-#include "errctl.h"
 
 #ifdef _MSC_VER
 #define ALIGNED_ALLOC(align, size) _aligned_malloc((size), (align))
@@ -49,10 +49,18 @@ extern "C"
     const age_t tk_max_age = 1;
     const age_t tk_max_occ_age = 30;
     const ELEM_T tk_img_rng_factor = 0.1;
+    const index_t tk_cmf_threshold = 4;
 
     static inline index_t min(int32_t lhs, int32_t rhs)
     {
         return lhs < rhs ? lhs : rhs;
+    }
+
+    static inline void swap2tracks(index_t lhs, index_t rhs)
+    {
+        customer_t temp = tk_tracks[lhs];
+        tk_tracks[lhs] = tk_tracks[rhs];
+        tk_tracks[rhs] = temp;
     }
 
 
@@ -156,7 +164,7 @@ extern "C"
 
     void tk_predict(void)
     {
-        customer_t *start = tk_tracks, *end = tk_tracks + tk_track_cnt - 1;
+        customer_t *start = tk_tracks + tk_occ_track_cnt, *end = tk_tracks + tk_track_cnt - 1;
         for (; start <= end; end--)
         {
             kf_predict(end->statemean, end->statecovariance);
@@ -176,7 +184,7 @@ extern "C"
         (void)ha_solve(tk_cost_mat, tk_assignment, tk_normal_track_cnt, num);
 
         //i for assignment, cost mat, j for tracks
-        index_t i, j, trk_cnt = tk_track_cnt, um_trk_cnt = 0, um_det_cnt = 0, new_occ_cnt = 0;
+        index_t i, j, trk_cnt = tk_normal_track_cnt, um_trk_cnt = 0, um_det_cnt = 0, new_occ_cnt = 0;
         for (i = tk_normal_track_cnt - 1, j = tk_track_cnt - 1; i >= 0; --i, --j)
         {
             // unmatched tracks
@@ -199,7 +207,7 @@ extern "C"
             {
                 kf_update(detections + tk_assignment[i], tk_tracks[i].statemean, tk_tracks[i].statecovariance);
                 tk_tracks[i].age = 0;
-                if (tk_tracks[i].cmf != 255 && ++(tk_tracks[i].cmf) == 4)
+                if (tk_tracks[i].cmf != 255 && ++(tk_tracks[i].cmf) == tk_cmf_threshold)
                     tk_tracks[i].is_stable = 1;
 
                 bv_clear(tk_unmatched_det_bool, tk_assignment[i]);
@@ -209,50 +217,9 @@ extern "C"
         //occlusion 으로 편입 [혹은 추후에 예정된 detection error 판단]
         if (um_trk_cnt > 0)
         {
-            new_occ_cnt = 0;   
-            /*
-            if (um_det_cnt > 0)
-            {
-                get_cost_mat_ext_iou(tk_cost_mat, tk_tracks, detections, tk_unmatched_tracks, tk_unmatched_dets, um_trk_cnt, um_det_cnt);
-                (void)ha_solve(tk_cost_mat, tk_assignment, um_trk_cnt, um_det_cnt);
-
-                trk_cnt = um_trk_cnt;
-                for (i = 0; i < um_trk_cnt; i++)
-                {
-                    // unmatched tracks
-                    if (tk_assignment[i] == -1 || 1 - tk_cost_mat[i + trk_cnt * tk_assignment[i]] < iou_threshold)
-                    {
-                        tk_mark_occluded(tk_unmatched_tracks[i]);
-                    }
-                    // matched tracks
-                    else
-                    {
-                        // kf_update(detections + tk_unmatched_dets[tk_assignment[i]], tk_tracks[tk_unmatched_tracks[i]].statemean, tk_tracks[tk_unmatched_tracks[i]].statecovariance);
-                        tk_tracks[tk_unmatched_tracks[i]].is_occluded = 0;
-                        tk_tracks[tk_unmatched_tracks[i]].age = 0;
-                        tk_tracks[tk_unmatched_tracks[i]].is_stable = 0;
-                        tk_tracks[tk_unmatched_tracks[i]].cmf = 0;
-                        to_xysr(detections + tk_unmatched_dets[tk_assignment[i]], tk_tracks[tk_unmatched_tracks[i]].statemean);
-                        tk_tracks[tk_unmatched_tracks[i]].statemean[4] = 0;
-                        tk_tracks[tk_unmatched_tracks[i]].statemean[5] = 0;
-                        tk_tracks[tk_unmatched_tracks[i]].statemean[6] = 0;
-                        tk_tracks[tk_unmatched_tracks[i]].statecovariance[0] = 10;
-                        tk_tracks[tk_unmatched_tracks[i]].statecovariance[1] = 10;
-                        tk_tracks[tk_unmatched_tracks[i]].statecovariance[2] = 10000;
-                        tk_tracks[tk_unmatched_tracks[i]].statecovariance[3] = 0;
-                        bv_clear(tk_unmatched_det_bool, tk_unmatched_dets[tk_assignment[i]]);
-                    }
-                }
-            }
-            else
-            {
-                index_t *iter = tk_unmatched_tracks, *end = tk_unmatched_tracks + um_trk_cnt;
-                for (; iter < end; iter++)
-                {
-                    tk_mark_occluded(*iter);
-                }
-            }
-            */
+            new_occ_cnt = um_trk_cnt;
+           
+            occ_detect(tk_tracks, tk_unmatched_tracks, um_trk_cnt);
         }
 
         //occlusion 탈출 여부 판단
@@ -266,6 +233,9 @@ extern "C"
                 }
             }
         }
+
+        //tk_occ_track_cnt += new_occ_cnt;
+        //tk_normal_track_cnt -= new_occ_cnt;
 
         // unmatched detections
         tk_create_new_track(detections, num);
@@ -349,6 +319,23 @@ extern "C"
         --tk_track_cnt;
         --tk_occ_track_cnt;
     }
+    
+    void tk_track2occ(index_t ind)
+    {
+        swap2tracks(ind, tk_occ_track_cnt);
+
+        tk_occ_track_cnt++;
+        tk_normal_track_cnt--;
+    }
+
+    void tk_occ2track(index_t ind)
+    {
+        swap2tracks(ind, tk_occ_track_cnt - 1);
+
+        tk_occ_track_cnt--;
+        tk_normal_track_cnt++;
+    }
+
 
     customer_t *tk_get_tracks(void)
     {
@@ -358,6 +345,16 @@ extern "C"
     index_t tk_get_track_num(void)
     {
         return tk_track_cnt;
+    }
+
+    index_t tk_get_normal_track_num(void)
+    {
+        return tk_normal_track_cnt;
+    }
+
+    index_t tk_get_occ_track_num(void)
+    {
+        return tk_occ_track_cnt;
     }
 
 #ifdef __cplusplus

@@ -17,9 +17,13 @@ void tk_mark_missed(index_t missed);
 void tk_delete_track_normal(index_t ind);
 void tk_delete_track_occ(index_t ind);
 void tk_mark_occluded(index_t occ);
+void tk_track2occ(index_t ind);
+void tk_occ2track(index_t ind);
 
 customer_t *tk_get_tracks(void);
 index_t tk_get_track_num(void);
+index_t tk_get_normal_track_num(void);
+index_t tk_get_occ_track_num(void);
 
 
 #ifdef __cplusplus

@@ -65,6 +65,48 @@ extern "C"
 		return iou;
 	}
 
+	ELEM_T get_iou_occ_track(ELEM_T* sv_track, const occlusion_point* occ)
+	{
+		// sv_track 은 xysr 로, occ 은 tlbr 로 들어오는 것을 가정
+		QELEM_T tlbr_t = to_tlbr(sv_track);
+		ELEM_T box_area_o = (occ->x2 - occ->x1) * (occ->y2 - occ->y1);
+
+		ELEM_T x1, x2, y1, y2, w, h, inter, iou;
+		x1 = max(tlbr_t.e1, occ->x1);
+		y1 = max(tlbr_t.e2, occ->y1);
+		x2 = min(tlbr_t.e3, occ->x2);
+		y2 = min(tlbr_t.e4, occ->y2);
+
+		w = max(0, x2 - x1);
+		h = max(0, y2 - y1);
+
+		inter = w * h;
+		iou = inter / (sv_track[2] + box_area_o - inter);
+
+		return iou;
+	}
+
+	ELEM_T get_iou_occ_det(detection_t* det, const occlusion_point* occ)
+	{
+		// det 는 tlbr 로, occ 은 tlbr 로 들어오는 것을 가정
+		ELEM_T box_area_d = (det->x2 - det->x1) * (det->y2 - det->y1);
+		ELEM_T box_area_o = (occ->x2 - occ->x1) * (occ->y2 - occ->y1);
+
+		ELEM_T x1, x2, y1, y2, w, h, inter, iou;
+		x1 = max(det->x1, occ->x1);
+		y1 = max(det->y1, occ->y1);
+		x2 = min(det->x2, occ->x2);
+		y2 = min(det->y2, occ->y2);
+
+		w = max(0, x2 - x1);
+		h = max(0, y2 - y1);
+
+		inter = w * h;
+		iou = inter / (box_area_d + box_area_o - inter);
+
+		return iou;
+	}
+
 	void get_cost_mat_iou(ELEM_T *cost_mat, const customer_t *tracks, const detection_t *detections, index_t trk_num, index_t det_num)
 	{
 		// row for detections, col for tracks
